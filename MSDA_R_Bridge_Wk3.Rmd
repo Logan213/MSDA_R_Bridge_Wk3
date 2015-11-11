@@ -1,0 +1,78 @@
+# **R Bridge Week 3 Assignment**
+### Logan Thomson
+
+### **Reading the data**
+
+We can open a file (or a URL), and pass it into R's `read.table` function.  The data did not have any header rows, so this parameter was set to `FALSE`, and we can use the `colClasses` parameter to select the columns that we want (I only used the first five).
+
+The data was then stored in an object called "`shrooms`".
+
+```{r}
+shrooms <- read.table('https://raw.githubusercontent.com/Logan213/MSDA_R_Bridge_Wk3/master/agaricus-lepiota.data.txt',header=FALSE, sep=",", colClasses = c(rep("character", 5), rep("NULL", 18)))
+```
+
+### **Creating a dataframe**
+
+Since the information we want is already selected from the previous step, we can simply pass the `shrooms` object into the `data.frame` function.
+
+```{r}
+shroomsDF <- data.frame(shrooms)
+```
+
+### **Adding column headers**
+
+Since the data was absent any column headers, we can create a character vector with the names of the headers for the data.
+
+```{r}
+names(shroomsDF) <- c("Edible?", "Cap Shape", "Cap Surface", "Cap Color", "Bruises?")
+```
+
+### **Renaming the data**
+
+All of the data in the file is simply letters whose meanings are defined by a key or legend in another file.  Here, we can select each column and use the `gsub` function to replace the letters with text that better defines the data.
+
+```{r}
+shroomsDF$`Edible?` <- gsub('e', 'Yes', shroomsDF$`Edible?`)
+shroomsDF$`Edible?` <- gsub('p', 'No', shroomsDF$`Edible?`)
+```
+
+#### Need for regular expressions
+
+Note that the strings we are replacing the single letter-codes with may also contain the same letter as another replaced attribute code.  For example, "Brown" has a letter "w" within the string.  Without the regular expression `\\bw\\b`, gsub would replace the "w" in "Brown" with "White", and we could end up with "BroWhiten".
+
+There is probably a prettier (and more efficient) way to do this, but I thought finding a way to do this part without installing anther package would be interesting.
+
+```{r}
+shroomsDF$`Cap Shape` <- gsub('b', 'Bell', shroomsDF$`Cap Shape`)
+shroomsDF$`Cap Shape` <- gsub('\\bc\\b', 'Conical', shroomsDF$`Cap Shape`)
+shroomsDF$`Cap Shape` <- gsub('x', 'Convex', shroomsDF$`Cap Shape`)
+shroomsDF$`Cap Shape` <- gsub('f', 'Flat', shroomsDF$`Cap Shape`)
+shroomsDF$`Cap Shape` <- gsub('k', 'Knobbed', shroomsDF$`Cap Shape`)
+shroomsDF$`Cap Shape` <- gsub('s', 'Sunken', shroomsDF$`Cap Shape`)
+
+shroomsDF$`Cap Surface` <- gsub('f', 'Fibrous', shroomsDF$`Cap Surface`)
+shroomsDF$`Cap Surface` <- gsub('g', 'Grooves', shroomsDF$`Cap Surface`)
+shroomsDF$`Cap Surface` <- gsub('y', 'Scaly', shroomsDF$`Cap Surface`)
+shroomsDF$`Cap Surface` <- gsub('\\bs\\b', 'Smooth', shroomsDF$`Cap Surface`)
+
+shroomsDF$`Cap Color` <- gsub('\\bn\\b', 'Brown', shroomsDF$`Cap Color`)
+shroomsDF$`Cap Color` <- gsub('\\bb\\b', 'Buff', shroomsDF$`Cap Color`)
+shroomsDF$`Cap Color` <- gsub('\\bc\\b', 'Cinnamon', shroomsDF$`Cap Color`)
+shroomsDF$`Cap Color` <- gsub('\\bg\\b', 'Gray', shroomsDF$`Cap Color`)
+shroomsDF$`Cap Color` <- gsub('\\br\\b', 'Green', shroomsDF$`Cap Color`)
+shroomsDF$`Cap Color` <- gsub('\\bp\\b', 'Pink', shroomsDF$`Cap Color`)
+shroomsDF$`Cap Color` <- gsub('\\bu\\b', 'Purple', shroomsDF$`Cap Color`)
+shroomsDF$`Cap Color` <- gsub('\\be\\b', 'Red', shroomsDF$`Cap Color`)
+shroomsDF$`Cap Color` <- gsub('\\bw\\b', 'White', shroomsDF$`Cap Color`)
+shroomsDF$`Cap Color` <- gsub('\\by\\b', 'Yellow', shroomsDF$`Cap Color`)
+
+shroomsDF$`Bruises?` <- gsub('t', 'Yes', shroomsDF$`Bruises?`)
+shroomsDF$`Bruises?` <- gsub('f', 'No', shroomsDF$`Bruises?`)
+
+```
+
+### **Preview of the transformed data**
+
+```{r}
+head(shroomsDF, 15)
+```
